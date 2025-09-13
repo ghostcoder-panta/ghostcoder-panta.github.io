@@ -17991,21 +17991,34 @@
                 `;
             }
 
-            // Grades
+            // Grades - FIXED: Properly display each grade separately
             let hasGrades = false;
             let gradesHTML = '<div class="grades-section">';
 
+            // Iterate through grades 1-5 with proper extraction
             for (let i = 1; i <= 5; i++) {
-                const gradeText = term.grades[i.toString()];
-                if (gradeText && gradeText !== '-') {
+                const gradeKey = i.toString();
+                const gradeText = term.grades[gradeKey];
+
+                // Only show grades that have content
+                if (gradeText && gradeText.trim() !== '' && gradeText !== '-') {
                     hasGrades = true;
+                    // Escape HTML entities for safety
+                    const escapedText = gradeText
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+
                     gradesHTML += `
                         <div class="grade-item grade-${i}">
                             <div class="grade-header">Grade ${i}</div>
-                            <div class="grade-text">${gradeText}</div>
+                            <div class="grade-text">${escapedText}</div>
                         </div>
                     `;
                 }
+            }
             }
 
             gradesHTML += '</div>';
