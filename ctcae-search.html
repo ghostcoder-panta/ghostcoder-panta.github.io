@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTCAE Browser - AuroraTrials</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #FFFFFF;
+            color: #000000;
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.52;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: #FFFFFF;
+            border-radius: 0;
+            padding: 40px 0;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #8F8F8F;
+        }
+
+        h1 {
+            color: #000000;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: #8F8F8F;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            font-weight: 400;
+        }
+
+        .version-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            align-items: center;
+        }
+
+        .version-selector label {
+            font-size: 0.95rem;
+            color: #000000;
+            font-weight: 500;
+        }
+
+        .version-btn {
+            padding: 12px 24px;
+            border: 2px solid #000000;
+            background: #FFFFFF;
+            color: #000000;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .version-btn:hover {
+            background: #000000;
+            color: #FFFFFF;
+        }
+
+        .version-btn.active {
+            background: #000000;
+            color: #FFFFFF;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1rem;
+            border: 2px solid #8F8F8F;
+            border-radius: 0;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #FFFFFF;
+            color: #000000;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .search-input:focus {
+            border-color: #000000;
+        }
+
+        .search-input::placeholder {
+            color: #8F8F8F;
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+            color: #8F8F8F;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: 1px solid #8F8F8F;
+            background: #FFFFFF;
+            color: #000000;
+            border-radius: 0;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 400;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn:hover {
+            background: #000000;
+            color: #FFFFFF;
+            border-color: #000000;
+        }
+
+        .btn.active {
+            background: #000000;
+            color: #FFFFFF;
+            border-color: #000000;
+        }
+
+        .main-content {
+            background: #FFFFFF;
+            padding: 0;
+        }
+
+        .soc-section {
+            margin-bottom: 20px;
+            border: 1px solid #8F8F8F;
+            border-radius: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .soc-section.hidden {
+            display: none;
+        }
+
+        .soc-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: #FFFFFF;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            border-bottom: 1px solid #8F8F8F;
+        }
+
+        .soc-header:hover {
+            background: #F5F5F5;
+        }
+
+        .soc-toggle {
+            margin-right: 15px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-icon {
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+            color: #000000;
+        }
+
+        .soc-section.expanded .toggle-icon {
+            transform: rotate(90deg);
+        }
+
+        .soc-title {
+            flex: 1;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #000000;
+        }
+
+        .soc-count {
+            background: #000000;
+            color: #FFFFFF;
+            padding: 4px 12px;
+            border-radius: 0;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .soc-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: #FFFFFF;
+        }
+
+        .soc-section.expanded .soc-content {
+            max-height: 5000px;
+        }
+
+        .terms-list {
+            padding: 10px;
+        }
+
+        .term-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin: 5px 0;
+            background: #FFFFFF;
+            border: 1px solid #8F8F8F;
+            border-radius: 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .term-item:hover {
+            background: #F5F5F5;
+            border-color: #000000;
+        }
+
+        .term-item.hidden {
+            display: none;
+        }
+
+        .favorite-icon {
+            font-size: 1.2rem;
+            color: #8F8F8F;
+            margin-right: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .favorite-icon:hover,
+        .favorite-icon.active {
+            color: #000000;
+        }
+
+        .term-name {
+            flex: 1;
+            color: #000000;
+            font-size: 0.95rem;
+        }
+
+        .term-arrow {
+            color: #000000;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .term-item:hover .term-arrow {
+            opacity: 1;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #FFFFFF;
+            border-radius: 0;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            padding: 30px 30px 20px;
+            border-bottom: 2px solid #8F8F8F;
+            position: sticky;
+            top: 0;
+            background: #FFFFFF;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 5px;
+            flex: 1;
+        }
+
+        .modal-favorite {
+            font-size: 1.5rem;
+            color: #8F8F8F;
+            margin-right: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-favorite:hover,
+        .modal-favorite.active {
+            color: #000000;
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border-radius: 0;
+            background: #F5F5F5;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #000000;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #000000;
+            color: #FFFFFF;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .definition-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #F5F5F5;
+            border-radius: 0;
+        }
+
+        .definition-label {
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .definition-text {
+            color: #000000;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .grades-section {
+            margin-bottom: 25px;
+        }
+
+        .grades-label {
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .grade-item {
+            margin-bottom: 12px;
+            padding: 15px;
+            background: #FFFFFF;
+            border-radius: 0;
+            border-left: 4px solid #000000;
+            transition: all 0.3s ease;
+        }
+
+        .grade-item:hover {
+            background: #F5F5F5;
+        }
+
+        .grade-header {
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .grade-text {
+            color: #000000;
+            line-height: 1.5;
+            font-size: 0.92rem;
+        }
+
+        .notes-section {
+            padding: 20px;
+            background: #F5F5F5;
+            border-radius: 0;
+            border-left: 4px solid #8F8F8F;
+        }
+
+        .notes-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #000000;
+        }
+
+        .notes-text {
+            color: #000000;
+            line-height: 1.5;
+            font-size: 0.92rem;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px;
+            color: #8F8F8F;
+            font-size: 1.1rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        /* Links underline as per brand guidelines */
+        a {
+            text-decoration: underline;
+            color: #000000;
+        }
+
+        a:hover {
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CTCAE Browser</h1>
+            <p class="subtitle">Common Terminology Criteria for Adverse Events</p>
+            
+            <div class="version-selector">
+                <label>Versão:</label>
+                <button class="version-btn active" id="btnV5" onclick="switchVersion('v5')">CTCAE v5.0</button>
+                <button class="version-btn" id="btnV6" onclick="switchVersion('v6')">CTCAE v6.0</button>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar por termo ou categoria SOC..." autocomplete="off">
+            </div>
+
+            <div class="stats">
+                <div><span id="visibleSocs">0</span> de <span id="totalSocs">0</span> categorias</div>
+                <div><span id="visibleTerms">0</span> de <span id="totalTerms">0</span> termos</div>
+                <div>Favoritos: <span id="favoritesCount">0</span></div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn" onclick="expandAll()">Expandir Tudo</button>
+                <button class="btn" onclick="collapseAll()">Colapsar Tudo</button>
+                <button class="btn" id="favoritesFilter" onclick="toggleFavoritesFilter()">Mostrar Apenas Favoritos</button>
+                <button class="btn" onclick="clearAllFavorites()">Limpar Favoritos</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div id="socContainer"></div>
+            <div id="noResults" class="no-results" style="display: none;">
+                Nenhum resultado encontrado.
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="termModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle"></h2>
+                <span class="modal-favorite" id="modalFavorite" onclick="toggleModalFavorite()">☆</span>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentVersion = 'v5';
+        let termsData = [];
+        let termsMap = {};
+        let favorites = JSON.parse(localStorage.getItem('ctcaeFavorites') || '[]');
+        let showFavoritesOnly = false;
+        let currentModalTermId = null;
+
+        // Load data on page load
+        window.onload = function() {
+            loadData('v5');
+        };
+
+        async function loadData(version) {
+            try {
+                const response = await fetch(`ctcae_${version}_data.json`);
+                termsData = await response.json();
+                
+                // Create map for quick access
+                termsMap = {};
+                termsData.forEach(term => {
+                    termsMap[term.id] = term;
+                });
+
+                renderData();
+                updateStats();
+                initializeFavorites();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('noResults').style.display = 'block';
+                document.getElementById('noResults').textContent = 'Erro ao carregar dados. Verifique se os arquivos JSON estão disponíveis.';
+            }
+        }
+
+        function switchVersion(version) {
+            currentVersion = version;
+            
+            // Update button states
+            document.getElementById('btnV5').classList.toggle('active', version === 'v5');
+            document.getElementById('btnV6').classList.toggle('active', version === 'v6');
+            
+            // Load new data
+            loadData(version);
+        }
+
+        function renderData() {
+            const container = document.getElementById('socContainer');
+            container.innerHTML = '';
+
+            // Group terms by SOC
+            const socGroups = {};
+            termsData.forEach(term => {
+                if (!socGroups[term.soc]) {
+                    socGroups[term.soc] = [];
+                }
+                socGroups[term.soc].push(term);
+            });
+
+            // Sort SOCs alphabetically
+            const sortedSocs = Object.keys(socGroups).sort();
+
+            // Create HTML for each SOC
+            sortedSocs.forEach(soc => {
+                const terms = socGroups[soc];
+                
+                const socSection = document.createElement('div');
+                socSection.className = 'soc-section';
+                socSection.dataset.soc = soc.toLowerCase();
+
+                const socHeader = document.createElement('div');
+                socHeader.className = 'soc-header';
+                socHeader.onclick = function() {
+                    socSection.classList.toggle('expanded');
+                };
+
+                socHeader.innerHTML = `
+                    <div class="soc-toggle">
+                        <span class="toggle-icon">▶</span>
+                    </div>
+                    <div class="soc-title">${soc}</div>
+                    <div class="soc-count">${terms.length} ${terms.length === 1 ? 'termo' : 'termos'}</div>
+                `;
+
+                const socContent = document.createElement('div');
+                socContent.className = 'soc-content';
+
+                const termsList = document.createElement('div');
+                termsList.className = 'terms-list';
+
+                terms.forEach(term => {
+                    const termItem = document.createElement('div');
+                    termItem.className = 'term-item';
+                    termItem.dataset.termId = term.id;
+                    termItem.dataset.termName = term.term.toLowerCase();
+
+                    termItem.innerHTML = `
+                        <span class="favorite-icon" onclick="toggleFavorite(event, ${term.id})" title="Adicionar aos favoritos">☆</span>
+                        <span class="term-name">${term.term}</span>
+                        <span class="term-arrow">→</span>
+                    `;
+
+                    termItem.onclick = function(e) {
+                        if (!e.target.classList.contains('favorite-icon')) {
+                            showTermModal(term.id);
+                        }
+                    };
+
+                    termsList.appendChild(termItem);
+                });
+
+                socContent.appendChild(termsList);
+                socSection.appendChild(socHeader);
+                socSection.appendChild(socContent);
+                container.appendChild(socSection);
+            });
+        }
+
+        function updateStats() {
+            const totalSocs = Object.keys(termsData.reduce((acc, term) => {
+                acc[term.soc] = true;
+                return acc;
+            }, {})).length;
+            
+            document.getElementById('totalSocs').textContent = totalSocs;
+            document.getElementById('visibleSocs').textContent = totalSocs;
+            document.getElementById('totalTerms').textContent = termsData.length;
+            document.getElementById('visibleTerms').textContent = termsData.length;
+        }
+
+        function showTermModal(termId) {
+            const term = termsMap[termId];
+            if (!term) return;
+
+            currentModalTermId = termId;
+            const modal = document.getElementById('termModal');
+
+            // Set title
+            document.getElementById('modalTitle').textContent = term.term;
+            updateModalFavorite();
+
+            // Build body content
+            let bodyHTML = '';
+
+            // Definition
+            if (term.definition && term.definition !== '-') {
+                bodyHTML += `
+                    <div class="definition-section">
+                        <div class="definition-label">Definição</div>
+                        <div class="definition-text">${term.definition}</div>
+                    </div>
+                `;
+            }
+
+            // Grades
+            if (term.grades) {
+                let hasGrades = false;
+                let gradesHTML = '<div class="grades-section"><div class="grades-label">Graus de Severidade</div>';
+
+                for (let i = 1; i <= 5; i++) {
+                    const gradeText = term.grades[i.toString()];
+                    if (gradeText && gradeText.trim() !== '' && gradeText !== '-') {
+                        hasGrades = true;
+                        gradesHTML += `
+                            <div class="grade-item">
+                                <div class="grade-header">Grau ${i}</div>
+                                <div class="grade-text">${gradeText}</div>
+                            </div>
+                        `;
+                    }
+                }
+
+                gradesHTML += '</div>';
+                if (hasGrades) {
+                    bodyHTML += gradesHTML;
+                }
+            }
+
+            // Notes
+            if (term.notes && term.notes !== '-' && term.notes !== 'nan') {
+                bodyHTML += `
+                    <div class="notes-section">
+                        <div class="notes-label">Notas de Navegação</div>
+                        <div class="notes-text">${term.notes}</div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('modalBody').innerHTML = bodyHTML;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('termModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            currentModalTermId = null;
+        }
+
+        // Close modal on background click
+        document.getElementById('termModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('termModal').classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            if (showFavoritesOnly) {
+                showFavoritesOnly = false;
+                document.getElementById('favoritesFilter').classList.remove('active');
+            }
+
+            const searchTerm = e.target.value.toLowerCase();
+            let visibleSocCount = 0;
+            let visibleTermCount = 0;
+
+            document.querySelectorAll('.soc-section').forEach(section => {
+                const socName = section.dataset.soc;
+                const termItems = section.querySelectorAll('.term-item');
+                let hasVisibleTerms = false;
+
+                const socMatches = socName.includes(searchTerm);
+
+                termItems.forEach(item => {
+                    const termName = item.dataset.termName;
+                    if (!searchTerm || socMatches || termName.includes(searchTerm)) {
+                        item.classList.remove('hidden');
+                        hasVisibleTerms = true;
+                        visibleTermCount++;
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
+
+                if (hasVisibleTerms) {
+                    section.classList.remove('hidden');
+                    visibleSocCount++;
+                    if (searchTerm) {
+                        section.classList.add('expanded');
+                    }
+                } else {
+                    section.classList.add('hidden');
+                }
+            });
+
+            document.getElementById('visibleSocs').textContent = visibleSocCount;
+            document.getElementById('visibleTerms').textContent = visibleTermCount;
+
+            const socContainer = document.getElementById('socContainer');
+            const noResults = document.getElementById('noResults');
+            if (visibleSocCount === 0) {
+                socContainer.style.display = 'none';
+                noResults.style.display = 'block';
+            } else {
+                socContainer.style.display = 'block';
+                noResults.style.display = 'none';
+            }
+        });
+
+        // Expand/Collapse functions
+        function expandAll() {
+            document.querySelectorAll('.soc-section').forEach(section => {
+                if (!section.classList.contains('hidden')) {
+                    section.classList.add('expanded');
+                }
+            });
+        }
+
+        function collapseAll() {
+            document.querySelectorAll('.soc-section').forEach(section => {
+                section.classList.remove('expanded');
+            });
+        }
+
+        // Favorites management
+        function initializeFavorites() {
+            updateFavoritesCount();
+            updateFavoriteIcons();
+        }
+
+        function updateFavoritesCount() {
+            document.getElementById('favoritesCount').textContent = favorites.length;
+        }
+
+        function updateFavoriteIcons() {
+            document.querySelectorAll('.term-item').forEach(item => {
+                const termId = parseInt(item.dataset.termId);
+                const icon = item.querySelector('.favorite-icon');
+                if (favorites.includes(termId)) {
+                    icon.textContent = '★';
+                    icon.classList.add('active');
+                } else {
+                    icon.textContent = '☆';
+                    icon.classList.remove('active');
+                }
+            });
+        }
+
+        function toggleFavorite(event, termId) {
+            event.stopPropagation();
+            const index = favorites.indexOf(termId);
+            if (index > -1) {
+                favorites.splice(index, 1);
+            } else {
+                favorites.push(termId);
+            }
+            localStorage.setItem('ctcaeFavorites', JSON.stringify(favorites));
+            updateFavoritesCount();
+            updateFavoriteIcons();
+
+            if (currentModalTermId === termId) {
+                updateModalFavorite();
+            }
+
+            if (showFavoritesOnly) {
+                filterByFavorites();
+            }
+        }
+
+        function toggleModalFavorite() {
+            if (currentModalTermId) {
+                toggleFavorite(new Event('click'), currentModalTermId);
+            }
+        }
+
+        function updateModalFavorite() {
+            const modalFav = document.getElementById('modalFavorite');
+            if (favorites.includes(currentModalTermId)) {
+                modalFav.textContent = '★';
+                modalFav.classList.add('active');
+            } else {
+                modalFav.textContent = '☆';
+                modalFav.classList.remove('active');
+            }
+        }
+
+        function clearAllFavorites() {
+            if (favorites.length === 0) {
+                alert('Nenhum favorito para limpar.');
+                return;
+            }
+            if (confirm(`Limpar todos os ${favorites.length} favoritos?`)) {
+                favorites = [];
+                localStorage.setItem('ctcaeFavorites', JSON.stringify(favorites));
+                updateFavoritesCount();
+                updateFavoriteIcons();
+                if (showFavoritesOnly) {
+                    toggleFavoritesFilter();
+                }
+                if (currentModalTermId) {
+                    updateModalFavorite();
+                }
+            }
+        }
+
+        function toggleFavoritesFilter() {
+            showFavoritesOnly = !showFavoritesOnly;
+            const btn = document.getElementById('favoritesFilter');
+
+            if (showFavoritesOnly) {
+                btn.classList.add('active');
+                filterByFavorites();
+            } else {
+                btn.classList.remove('active');
+                resetFilter();
+            }
+        }
+
+        function filterByFavorites() {
+            let visibleSocCount = 0;
+            let visibleTermCount = 0;
+
+            document.querySelectorAll('.soc-section').forEach(section => {
+                const termItems = section.querySelectorAll('.term-item');
+                let hasVisibleTerms = false;
+
+                termItems.forEach(item => {
+                    const termId = parseInt(item.dataset.termId);
+                    if (favorites.includes(termId)) {
+                        item.classList.remove('hidden');
+                        hasVisibleTerms = true;
+                        visibleTermCount++;
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
+
+                if (hasVisibleTerms) {
+                    section.classList.remove('hidden');
+                    section.classList.add('expanded');
+                    visibleSocCount++;
+                } else {
+                    section.classList.add('hidden');
+                }
+            });
+
+            document.getElementById('visibleSocs').textContent = visibleSocCount;
+            document.getElementById('visibleTerms').textContent = visibleTermCount;
+
+            const socContainer = document.getElementById('socContainer');
+            const noResults = document.getElementById('noResults');
+            if (visibleSocCount === 0) {
+                socContainer.style.display = 'none';
+                noResults.style.display = 'block';
+                noResults.textContent = favorites.length === 0 ? 
+                    'Nenhum favorito selecionado. Clique na estrela ao lado dos termos para adicioná-los aos favoritos.' : 
+                    'Nenhum resultado encontrado.';
+            } else {
+                socContainer.style.display = 'block';
+                noResults.style.display = 'none';
+            }
+        }
+
+        function resetFilter() {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput.value) {
+                searchInput.dispatchEvent(new Event('input'));
+            } else {
+                document.querySelectorAll('.soc-section').forEach(section => {
+                    section.classList.remove('hidden');
+                });
+                document.querySelectorAll('.term-item').forEach(item => {
+                    item.classList.remove('hidden');
+                });
+
+                updateStats();
+                document.getElementById('socContainer').style.display = 'block';
+                document.getElementById('noResults').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
